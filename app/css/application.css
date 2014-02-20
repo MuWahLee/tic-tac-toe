@@ -11,26 +11,26 @@ html,
 body {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
 	font-weight: normal;
-	font-style: normal;
+	font-style:  normal;
 	line-height: 1;
-	cursor: default;
-	margin: 0;
-	padding: 0;
+	cursor:      default;
+	margin:      0;
+	padding:     0;
 	color: hsla( 0, 0.0%, 13.3%, 1 );
 	background-color: hsla( 0, 0.0%, 100.0%, 1 );
 }
 
 h1{
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	font-size: 2.4em;
+	font-size:   2.4em;
 	font-weight: normal;
 	line-height: 3em;
-	margin: 20px 0 0;
-	padding: 0;
-	text-align: center;
+	margin:      20px 0 0;
+	padding:     0;
+	text-align:  center;
 }
 
-.tic .tac .toe {background-color: hsla( 0, 0.0%, 100.0%, 1); }
+.tic .tac .toe {background-color: hsla( 0, 0.0%, 100.0%, 1 ); }
 .tic {color: hsla(   2, 64.7%, 50.0%, 1 ); }
 .tac {color: hsla( 120, 39.6%, 46.0%, 1 ); }
 .toe {color: hsla( 208, 55.9%, 44.5%, 1 ); }
@@ -47,14 +47,14 @@ h1{
 
 .board-cell {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	font-size: 60px;
-	float: left;
-	text-align: center;
+	font-size:   60px;
+	float:       left;
+	text-align:  center;
 	text-transform: uppercase;
-	width: 78px;
-	height: 78px;
+	width:       78px;
+	height:      78px;
 	padding-top: 5px;
-	border: 1px solid hsla( 0, 0.0%, 60.0%, 1);
+	border:      1px solid hsla( 0, 0.0%, 60.0%, 1 );
 }
 
 .top    {border-top:    0;}
@@ -62,11 +62,11 @@ h1{
 .left   {border-left:   0;}
 .right  {border-right:  0;}
 
-.x {color: hsla( 208, 55.9%, 44.5%, 1); }
-.o {color: hsla( 120, 39.6%, 46.9%, 1); }
+.x {color: hsla( 208, 55.9%, 44.5%, 1 ); }
+.o {color: hsla( 120, 39.6%, 46.9%, 1 ); }
 
-.win {color: hsla( 2, 64.7%, 50.0%, 1); }
-.unwin {color: hsla( 0, 0.0%, 80.0%, 1); }
+.win   {color: hsla( 2, 64.7%, 50.0%, 1 ); }
+.unwin {color: hsla( 0, 0.0%, 80.0%, 1 ); }
 
 
 
