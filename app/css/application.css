@@ -1,6 +1,15 @@
+/* 	{color: hsla(   0,  0.0%, 100.0%, 1 ); }  white
+*		{color: hsla(   0,  0.0%,  13.3%, 1 ); }  off white
+*		{color: hsla(   2, 64.7%,  50.0%, 1 ); }	red
+*		{color: hsla( 120, 39.6%,  46.0%, 1 ); }  green
+*		{color: hsla( 208, 55.9%,  44.5%, 1 ); }  blue
+*		{color: hsla(   0,  0.0%,  60.0%, 1 ); }	dark grey
+*		{color: hsla(   0,  0.0%,  80.0%, 1 ); }	light grey
+*/
+
 html,
 body {
-	font-family: verdana, Helvetica, Arial, sans-serif;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
 	font-weight: normal;
 	font-style: normal;
 	line-height: 1;
@@ -27,7 +36,7 @@ h1{
 .toe {color: hsla( 208, 55.9%, 44.5%, 1 ); }
 
 .board {
-	width: 240px;
+	width:  240px;
 	height: 240px;
 	margin: 10px auto 20px;
 }
@@ -54,7 +63,10 @@ h1{
 .right  {border-right:  0;}
 
 .x {color: hsla( 208, 55.9%, 44.5%, 1); }
-.o {color: hsla(120, 39.6%, 46.9%, 1); }
+.o {color: hsla( 120, 39.6%, 46.9%, 1); }
 
-.win {color: hsla ( 2, 64.7%, 50.0%, 1 ); }
-.unwin {color: hsla( 0, 0.0%, 80.0%, 1 ); }
+.win {color: hsla( 2, 64.7%, 50.0%, 1); }
+.unwin {color: hsla( 0, 0.0%, 80.0%, 1); }
+
+
+
