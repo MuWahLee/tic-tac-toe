@@ -4,7 +4,7 @@
     var checkForWin, clearBoard, isX, resetBoard;
     isX = true;
     clearBoard = function() {
-      $('.board-cell').text('');
+      $('.board-cell').text('').removeClass("x").removeClass("o");
       return isX = true;
     };
     resetBoard = function() {
@@ -19,7 +19,7 @@
       })).get();
       win = ((board[0] === (_ref1 = board[1]) && _ref1 === (_ref = board[2])) && _ref !== '') ? board[0] : ((board[3] === (_ref3 = board[4]) && _ref3 === (_ref2 = board[5])) && _ref2 !== '') ? board[3] : ((board[6] === (_ref5 = board[7]) && _ref5 === (_ref4 = board[8])) && _ref4 !== '') ? board[6] : ((board[0] === (_ref7 = board[3]) && _ref7 === (_ref6 = board[6])) && _ref6 !== '') ? board[0] : ((board[1] === (_ref9 = board[4]) && _ref9 === (_ref8 = board[7])) && _ref8 !== '') ? board[1] : ((board[2] === (_ref11 = board[5]) && _ref11 === (_ref10 = board[8])) && _ref10 !== '') ? board[2] : ((board[0] === (_ref13 = board[4]) && _ref13 === (_ref12 = board[8])) && _ref12 !== '') ? board[0] : ((board[2] === (_ref15 = board[4]) && _ref15 === (_ref14 = board[6])) && _ref14 !== '') ? board[2] : '';
       if (win !== '') {
-        alert(win + 'won!');
+        alert(win + ' won!');
         return resetBoard();
       }
     };

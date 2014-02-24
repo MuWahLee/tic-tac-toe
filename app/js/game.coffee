@@ -3,7 +3,7 @@ $ ->
   isX = true
 
   clearBoard = ->
-    $('.board-cell').text('')
+    $('.board-cell').text('').removeClass("x").removeClass("o")
     isX = true
 
   resetBoard = ->
@@ -36,7 +36,7 @@ $ ->
       ''
 
     if win != ''
-      alert win + 'won!'
+      alert win + ' won!'
       resetBoard()
 
 
