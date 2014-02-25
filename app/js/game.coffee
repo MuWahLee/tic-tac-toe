@@ -33,22 +33,35 @@ $ ->
     win = ''
     board = ( $('.board-cell').map (idx, el) -> $(el).text() ).get()
 
-    patternsToTest = WIN_PATTERNS.filter (pattern) -> cell in pattern
+    patternsToTest = WIN_PATTERNS.filter (pattern) -> getCellNumber(cell) in pattern
 
     for p in patternsToTest
       win = board[p[0]] if '' != board[p[0]] == board[p[1]] == board[p[2]]
 
     if win != ''
       alert win + ' won!'
-    else if counter >8
-      alert 'tied game'
       resetGame()
+    else if counter > 7
+      checkForUnwin(cell, patternsToTest)
+    else if counter > 8
+      alert 'Game Tie..'
+      resetGame()
+
+  checkForUnwin = (cell, patternsToTest) ->
+    for p in patternsToTest
+      unwin = if cell.text() == 'x' or cell.text() == 'o' then true else false
+      console.log p
+    if unwin = true
+      alert "Game unwinnable!"
+      resetGame()
+
+
 
   markCell = (cell, mark) ->
     cell.text mark
     cell.addClass mark
     counter += 1
-    checkForWin( getCellNumber(cell) ) if counter > 4
+    checkForWin(cell) if counter > 4
 
   # Handle start game clicks
   $('#start-game').on 'click', (e) ->

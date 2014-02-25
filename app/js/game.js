@@ -3,7 +3,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   $(function() {
-    var WIN_PATTERNS, checkForWin, clearBoard, counter, getCellNumber, isEmpty, markCell, resetGame;
+    var WIN_PATTERNS, checkForUnwin, checkForWin, clearBoard, counter, getCellNumber, isEmpty, markCell, resetGame;
     counter = 0;
     WIN_PATTERNS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
     isEmpty = function(cell) {
@@ -30,7 +30,8 @@
         return $(el).text();
       })).get();
       patternsToTest = WIN_PATTERNS.filter(function(pattern) {
-        return __indexOf.call(pattern, cell) >= 0;
+        var _ref;
+        return _ref = getCellNumber(cell), __indexOf.call(pattern, _ref) >= 0;
       });
       for (_i = 0, _len = patternsToTest.length; _i < _len; _i++) {
         p = patternsToTest[_i];
@@ -39,9 +40,24 @@
         }
       }
       if (win !== '') {
-        return alert(win + ' won!');
+        alert(win + ' won!');
+        return resetGame();
+      } else if (counter > 7) {
+        return checkForUnwin(cell, patternsToTest);
       } else if (counter > 8) {
-        alert('tied game');
+        alert('Game Tie..');
+        return resetGame();
+      }
+    };
+    checkForUnwin = function(cell, patternsToTest) {
+      var p, unwin, _i, _len;
+      for (_i = 0, _len = patternsToTest.length; _i < _len; _i++) {
+        p = patternsToTest[_i];
+        unwin = cell.text() === 'x' || cell.text() === 'o' ? true : false;
+        console.log(p);
+      }
+      if (unwin = true) {
+        alert("Game unwinnable!");
         return resetGame();
       }
     };
@@ -50,7 +66,7 @@
       cell.addClass(mark);
       counter += 1;
       if (counter > 4) {
-        return checkForWin(getCellNumber(cell));
+        return checkForWin(cell);
       }
     };
     $('#start-game').on('click', function(e) {
