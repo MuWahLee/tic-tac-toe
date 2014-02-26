@@ -27,14 +27,18 @@ class BoardCtrl
     "#{c0}#{c1}#{c2}"
 
 
-  someoneWon (board) ->
+  someoneWon: (board) ->
     'xxx' == board || 'ooo' == board
 
   resetBoard: =>
     @$scope.cells ={}
 
+  numberOfMoves: =>
+    Object.keys(@$scope.cells).length
+
+
   announceWinner: =>
-    winner = if @$scope.cells % 2 == 0 then 'o' else 'x'
+    winner = if @numberOfMoves() % 2 == 0 then 'o' else 'x'
     alert "#{winner} wins!"
 
 
