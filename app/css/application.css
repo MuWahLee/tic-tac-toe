@@ -103,8 +103,9 @@ h1 {
   top:  208px;
   left: 25%;
   width:  50%;
+  margin: auto;
   padding:  5px;
-  font-size: 40px
+  font-size: 40px;
   text-align: center;
   text-transform: uppercase;
   color: hsla(   60, 100.0%,  50.0%,  1);
@@ -119,22 +120,22 @@ h1 {
 }
 
 .x.winner.message {
-  background-color: hsla( 208,  55.9%,  44.5%, 1 );
+  background-color: hsla( 208,  55.9%,  44.5%, 0.7 );
 }
 
 .o.winner.message {
-  background-color:  hsla( 120,  39.6%,  46.0%, 1 );
+  background-color:  hsla( 120,  39.6%,  46.0%, 0.7 );
 }
 
 @media (max-width: 760px) {
-  .message{
+  .message {
     left: 15%;
     width:  70%;
   }
 }
 
 @media (max-width: 520px) {
-  .message{
+  .message {
     top:  218px;
     left: 5%;
     width:  88%;
