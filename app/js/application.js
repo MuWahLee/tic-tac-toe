@@ -33,7 +33,8 @@
 
     BoardCtrl.prototype.startGame = function() {
       this.$scope.gameOn = true;
-      return resetBoard();
+      this.$scope.currentPlayer = this.player();
+      return this.resetBoard();
     };
 
     BoardCtrl.prototype.getPatterns = function() {
@@ -56,7 +57,10 @@
     };
 
     BoardCtrl.prototype.resetBoard = function() {
+      this.$scope.theWinnerIs = false;
+      this.$scope.cats = false;
       this.cells = this.$scope.cells = {};
+      this.$scope.currentPlayer = this.player();
       return this.getPatterns();
     };
 
@@ -122,12 +126,12 @@
       winner = this.player({
         whoMovedLast: true
       });
-      alert("" + winner + " wins!");
+      this.$scope.theWinnerIs = winner;
       return this.$scope.gameOn = false;
     };
 
     BoardCtrl.prototype.announceTie = function() {
-      alert("It's a tie!");
+      this.$scope.cats = true;
       return this.$scope.gameOn = false;
     };
 
@@ -156,9 +160,12 @@
     BoardCtrl.prototype.mark = function($event) {
       var cell;
       this.$event = $event;
-      cell = this.$event.target.dataset.index;
-      this.cells[cell] = this.player();
-      return this.parseBoard();
+      if (this.$scope.gameOn) {
+        cell = this.$event.target.dataset.index;
+        this.cells[cell] = this.player();
+        this.parseBoard();
+        return this.$scope.currentPlayer = this.player();
+      }
     };
 
     return BoardCtrl;
