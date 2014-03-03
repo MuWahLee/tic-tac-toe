@@ -31,15 +31,21 @@
       this.$scope.mark = this.mark;
       this.$scope.startGame = this.startGame;
       this.$scope.gameOn = false;
-      this.dbref = new Firebase("https://tictactoemwl.firebaseio.com/");
-      this.db = this.$firebase(this.dbref);
     }
 
+    BoardCtrl.prototype.uniqueId = function(length) {
+      var id;
+      if (length == null) {
+        length = 8;
+      }
+      id = "";
+      while (id.length < length) {
+        id += Math.random().toString(36).substr(2);
+      }
+      return id.substr(0, length);
+    };
+
     BoardCtrl.prototype.startGame = function() {
-      this.db.$add({
-        name: "mwl",
-        g: "f"
-      });
       this.$scope.gameOn = true;
       return this.resetBoard();
     };
@@ -68,6 +74,9 @@
       this.$scope.cats = false;
       this.cells = this.$scope.cells = {};
       this.winningCells = this.$scope.winningCells = {};
+      this.id = this.uniqueId();
+      this.dbref = new Firebase("https://tictactoemwl.firebaseio.com/" + this.id);
+      this.db = this.$firebase(this.dbref);
       this.$scope.currentPlayer = this.player();
       return this.getPatterns();
     };
@@ -176,6 +185,9 @@
       cell = this.$event.target.dataset.index;
       if (this.$scope.gameOn && !this.cells[cell]) {
         this.cells[cell] = this.player();
+        this.db.$set({
+          board: this.cells
+        });
         this.parseBoard();
         return this.$scope.currentPlayer = this.player();
       }
