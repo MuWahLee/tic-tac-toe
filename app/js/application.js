@@ -46,8 +46,19 @@
     };
 
     BoardCtrl.prototype.startGame = function() {
-      this.$scope.gameOn = true;
-      return this.resetBoard();
+      this.resetBoard();
+      if (this.unbind) {
+        this.unbind();
+      }
+      this.id = this.uniqueId();
+      this.dbref = new Firebase("https://tictactoemwl.firebaseio.com/" + this.id);
+      this.db = this.$firebase(this.dbref);
+      return this.db.$bind(this.$scope, 'cells').then((function(_this) {
+        return function(unbind) {
+          _this.unbind = unbind;
+          return _this.$scope.gameOn = true;
+        };
+      })(this));
     };
 
     BoardCtrl.prototype.getPatterns = function() {
@@ -74,17 +85,6 @@
       this.$scope.cats = false;
       this.cells = this.$scope.cells = {};
       this.winningCells = this.$scope.winningCells = {};
-      if (this.unbind) {
-        this.unbind();
-      }
-      this.id = this.uniqueId();
-      this.dbref = new Firebase("https://tictactoemwl.firebaseio.com/" + this.id);
-      this.db = this.$firebase(this.dbref);
-      this.db.$bind(this.$scope, 'cells').then((function(_this) {
-        return function(unbind) {
-          return _this.unbind = unbind;
-        };
-      })(this));
       this.$scope.currentPlayer = this.player();
       return this.getPatterns();
     };
@@ -152,7 +152,7 @@
       _ref = this.cells;
       for (k in _ref) {
         v = _ref[k];
-        this.winningCells[k] = parseInt((_ref1 = k, __indexOf.call(winningPattern, _ref1) >= 0)) ? 'win' : 'unwin';
+        this.winningCells[k] = (_ref1 = parseInt(k), __indexOf.call(winningPattern, _ref1) >= 0) ? 'win' : 'unwin';
       }
       this.$scope.theWinnerIs = winner;
       return this.$scope.gameOn = false;
