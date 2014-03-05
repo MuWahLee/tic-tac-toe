@@ -20,17 +20,22 @@
       this.announceTie = __bind(this.announceTie, this);
       this.announceWinner = __bind(this.announceWinner, this);
       this.gameUnwinnable = __bind(this.gameUnwinnable, this);
-      this.player = __bind(this.player, this);
+      this.isMyTurn = __bind(this.isMyTurn, this);
       this.movesRemaining = __bind(this.movesRemaining, this);
       this.numberOfMoves = __bind(this.numberOfMoves, this);
       this.resetBoard = __bind(this.resetBoard, this);
       this.getRow = __bind(this.getRow, this);
       this.getPatterns = __bind(this.getPatterns, this);
       this.startGame = __bind(this.startGame, this);
+      this.createGame = __bind(this.createGame, this);
       this.resetBoard();
+      this.player = 'x';
       this.$scope.mark = this.mark;
       this.$scope.startGame = this.startGame;
       this.$scope.gameOn = false;
+      this.$scope.currentPlayer = this.player;
+      this.dbRef = new Firebase("https://tictactoemwl.firebaseio.com/games/");
+      this.queueRef = new Firebase("https://tictactoemwl.firebaseio.com/queue");
     }
 
     BoardCtrl.prototype.uniqueId = function(length) {
@@ -45,18 +50,45 @@
       return id.substr(0, length);
     };
 
-    BoardCtrl.prototype.startGame = function() {
+    BoardCtrl.prototype.createGame = function(gameId) {
+      this.db = this.$firebase(this.dbRef.child(gameId));
       this.resetBoard();
-      if (this.unbind) {
-        this.unbind();
-      }
-      this.id = this.uniqueId();
-      this.dbref = new Firebase("https://tictactoemwl.firebaseio.com/" + this.id);
-      this.db = this.$firebase(this.dbref);
       return this.db.$bind(this.$scope, 'cells').then((function(_this) {
         return function(unbind) {
           _this.unbind = unbind;
           return _this.$scope.gameOn = true;
+        };
+      })(this));
+    };
+
+    BoardCtrl.prototype.startGame = function() {
+      this.resetBoard();
+      this.playerId = this.uniqueId();
+      return this.queueRef.transaction((function(_this) {
+        return function(gameId) {
+          if (gameId === null) {
+            return _this.gameId = _this.uniqueId();
+          } else {
+            _this.gameId = gameId;
+            return null;
+          }
+        };
+      })(this), (function(_this) {
+        return function(error, committed, snapshot) {
+          var gameId;
+          if (committed && !error) {
+            gameId = snapshot.val();
+            if (gameId) {
+              console.log("Creating game " + gameId);
+              _this.createGame(gameId);
+              return console.log("I am player:", _this.player);
+            } else {
+              console.log("Joining game " + _this.gameId);
+              _this.createGame(_this.gameId);
+              _this.player = 'o';
+              return console.log("I am player:", _this.player);
+            }
+          }
         };
       })(this));
     };
@@ -69,7 +101,7 @@
 
     BoardCtrl.prototype.getRow = function(pattern) {
       var c, c0, c1, c2;
-      c = this.cells;
+      c = this.$scope.cells;
       c0 = c[pattern[0]] || pattern[0];
       c1 = c[pattern[1]] || pattern[1];
       c2 = c[pattern[2]] || pattern[2];
@@ -83,14 +115,14 @@
     BoardCtrl.prototype.resetBoard = function() {
       this.$scope.theWinnerIs = false;
       this.$scope.cats = false;
-      this.cells = this.$scope.cells = {};
+      this.$scope.cells = {};
       this.winningCells = this.$scope.winningCells = {};
-      this.$scope.currentPlayer = this.player();
+      this.$scope.currentPlayer = this.player;
       return this.getPatterns();
     };
 
     BoardCtrl.prototype.numberOfMoves = function() {
-      return Object.keys(this.cells).length;
+      return Object.keys(this.$scope.cells).length;
     };
 
     BoardCtrl.prototype.movesRemaining = function(player) {
@@ -105,17 +137,14 @@
       }
     };
 
-    BoardCtrl.prototype.player = function(options) {
-      var moves;
+    BoardCtrl.prototype.isMyTurn = function(player, options) {
+      var moves, turn;
       options || (options = {
         whoMovedLast: false
       });
       moves = this.numberOfMoves() - (options.whoMovedLast ? 1 : 0);
-      if (moves % 2 === 0) {
-        return 'x';
-      } else {
-        return 'o';
-      }
+      turn = moves % 2 === 0 ? 'x' : 'o';
+      return player === turn;
     };
 
     BoardCtrl.prototype.isMixedRow = function(row) {
@@ -148,8 +177,8 @@
 
     BoardCtrl.prototype.announceWinner = function(winningPattern) {
       var k, v, winner, _ref, _ref1;
-      winner = this.cells[winningPattern[0]];
-      _ref = this.cells;
+      winner = this.$scope.cells[winningPattern[0]];
+      _ref = this.$scope.cells;
       for (k in _ref) {
         v = _ref[k];
         this.winningCells[k] = (_ref1 = parseInt(k), __indexOf.call(winningPattern, _ref1) >= 0) ? 'win' : 'unwin';
@@ -170,6 +199,10 @@
     BoardCtrl.prototype.parseBoard = function() {
       var winningPattern;
       winningPattern = false;
+      console.log("x remaining moves: ", this.movesRemaining('x'));
+      console.log("o remaining moves: ", this.movesRemaining('o'));
+      console.log("Number of moves: ", this.numberOfMoves());
+      console.log("$scope.cells: ", this.$scope.cells);
       this.patternsToTest = this.patternsToTest.filter((function(_this) {
         return function(pattern) {
           var row;
@@ -191,10 +224,13 @@
       var cell;
       this.$event = $event;
       cell = this.$event.target.dataset.index;
-      if (this.$scope.gameOn && !this.cells[cell]) {
-        this.cells[cell] = this.player();
+      if (this.$scope.gameOn && !this.$scope.cells[cell] && this.isMyTurn(this.player)) {
+        console.log(this.$scope);
+        console.log("$scope.cells before assigning value: ", this.$scope.cells);
+        this.$scope.cells[cell] = this.player;
+        console.log("after assigning value: ", this.$scope.cells);
         this.parseBoard();
-        return this.$scope.currentPlayer = this.player();
+        return this.$scope.currentPlayer = this.player;
       }
     };
 

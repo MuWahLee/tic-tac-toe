@@ -17,30 +17,78 @@ ticTacToe.constant 'WIN_PATTERNS',
 class BoardCtrl
   constructor: (@$scope, @WIN_PATTERNS, @$firebase) ->
     @resetBoard()
+    @player = 'x'
     @$scope.mark = @mark
     @$scope.startGame = @startGame
     @$scope.gameOn = false
+    @$scope.currentPlayer = @player
+    @dbRef = new Firebase "https://tictactoemwl.firebaseio.com/games/"
+    @queueRef = new Firebase "https://tictactoemwl.firebaseio.com/queue"
 
   uniqueId: (length = 8) ->
     id = ""
     id += Math.random().toString(36).substr(2) while id.length < length
     id.substr 0, length
 
-  startGame: =>
+  # reviewQueue: (queue) =>
+  #   if queue
+  #     @player = 2
+  #     console.log queue
+  #     null
+  #   else
+  #     @player = 1
+  #     console.log @id
+  #     @id
+
+  # @firebaseError: (error, committed, snapshot) ->
+  #   console.log "error:", error
+  #   console.log "committed:", committed
+  #   console.log "snapshot:", snapshot
+
+  createGame: (gameId) =>
+    @db = @$firebase @dbRef.child (gameId)
     @resetBoard()
-    @unbind() if @unbind
-    @id = @uniqueId()
-    @dbref = new Firebase "https://tictactoemwl.firebaseio.com/#{@id}"
-    @db = @$firebase @dbref
+    # @unbind() if @unbind
+    # @queue = @$firebase @queueRef.child ('id')
+    # @queueRef.transaction(@reviewQueue, @firebaseError)
+    # log
     @db.$bind( @$scope, 'cells' ).then (unbind) =>
       @unbind = unbind
       @$scope.gameOn = true
 
+    # @playersRef = @$firebase @dbRef.child ('players')
+    # @playersRef.$set @$scope.currentPlayer
+    # @playersRef.$bind( @$scope, 'currentPlayer')
+    
+
+  startGame: =>
+    @resetBoard()
+    @playerId = @uniqueId()
+
+    @queueRef.transaction (gameId) =>
+      if gameId == null
+        @gameId = @uniqueId()
+      else
+        @gameId = gameId
+        null
+    , (error, committed, snapshot) =>
+      if committed and not error
+        gameId = snapshot.val()
+        if gameId
+          console.log "Creating game #{gameId}"
+          @createGame(gameId)
+          console.log "I am player:", @player
+        else
+          console.log "Joining game #{@gameId}"
+          @createGame(@gameId)
+          @player = 'o'
+          console.log "I am player:", @player
+    
   getPatterns: =>
     @patternsToTest = @WIN_PATTERNS.filter -> true
 
   getRow: (pattern) =>
-    c = @cells
+    c = @$scope.cells
     c0 = c[pattern[0]] || pattern[0]
     c1 = c[pattern[1]] || pattern[1]
     c2 = c[pattern[2]] || pattern[2]
@@ -52,13 +100,13 @@ class BoardCtrl
   resetBoard: =>
     @$scope.theWinnerIs = false
     @$scope.cats = false
-    @cells = @$scope.cells = {}
+    @$scope.cells = {}
     @winningCells = @$scope.winningCells = {}
-    @$scope.currentPlayer = @player()
+    @$scope.currentPlayer = @player
     @getPatterns()
 
   numberOfMoves: =>
-    Object.keys(@cells).length
+    Object.keys(@$scope.cells).length
 
   movesRemaining: (player) =>
     totalMoves = 9 - @numberOfMoves()
@@ -70,10 +118,11 @@ class BoardCtrl
     else
       totalMoves
 
-  player: (options) =>
+  isMyTurn: (player, options) =>
     options ||= whoMovedLast: false
     moves = @numberOfMoves() - (if options.whoMovedLast then 1 else 0)
-    if moves % 2 == 0 then 'x' else 'o'
+    turn = if moves % 2 == 0 then 'x' else 'o'
+    player == turn
 
   isMixedRow: (row) ->
     !!row.match(/o+\d?x+|x+\d?o+/i)
@@ -97,9 +146,10 @@ class BoardCtrl
     @patternsToTest.length < 1
 
   announceWinner: (winningPattern) =>
-    winner = @cells[winningPattern[0]]
-    for k, v of @cells
-      @winningCells[k] = if parseInt(k) in winningPattern then 'win' else 'unwin'
+    winner = @$scope.cells[winningPattern[0]]
+    for k, v of @$scope.cells
+      @winningCells[k] = if parseInt(k) in winningPattern then 'win'
+      else 'unwin'
     @$scope.theWinnerIs = winner
     @$scope.gameOn = false
     
@@ -117,12 +167,14 @@ class BoardCtrl
 
   parseBoard: =>
     winningPattern = false
-
+    console.log "x remaining moves: ", @movesRemaining('x')
+    console.log "o remaining moves: ", @movesRemaining('o')
+    console.log "Number of moves: ", @numberOfMoves()
+    console.log "$scope.cells: ", @$scope.cells
     @patternsToTest = @patternsToTest.filter (pattern) =>
       row = @getRow(pattern)
       winningPattern ||= pattern if @someoneWon(row)
       @rowStillWinnable(row)
-
     if winningPattern
       @announceWinner(winningPattern)
     else if @gameUnwinnable()
@@ -130,11 +182,13 @@ class BoardCtrl
 
   mark: (@$event) =>
     cell = @$event.target.dataset.index
-    if @$scope.gameOn && !@cells[cell]
-      @cells[cell] = @player()
+    if @$scope.gameOn && !@$scope.cells[cell] && @isMyTurn(@player)
+      console.log @$scope
+      console.log "$scope.cells before assigning value: ", @$scope.cells
+      @$scope.cells[cell] = @player
+      console.log "after assigning value: ", @$scope.cells
       @parseBoard()
-      @$scope.currentPlayer = @player()
-
+      @$scope.currentPlayer = @player
 
 BoardCtrl.$inject = ["$scope", "WIN_PATTERNS", "$firebase"]
 ticTacToe.controller "BoardCtrl", BoardCtrl
